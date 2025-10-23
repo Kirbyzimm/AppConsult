@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html class="dark" lang="pt-br">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Painel Admin - Gerenciar Abastecimentos</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1173d4",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        #export-data-area {
+            white-space: pre-wrap;
+            font-family: monospace;
+            background-color: #0000001a;
+            padding: 10px;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ffffff1a;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200">
+<div class="flex flex-col h-screen">
+    <header class="sticky top-0 z-10 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-sm">
+        <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+            <button class="p-2 -ml-2 text-gray-600 dark:text-gray-300" onclick="document.location.href='index.html'">
+                <span class="material-symbols-outlined"> arrow_back </span>
+            </button>
+            <h1 class="text-lg font-bold text-gray-900 dark:text-white">Painel do Administrador</h1>
+            <button onclick="openExportModal()" class="flex h-10 w-10 items-center justify-center rounded-full text-gray-600 dark:text-gray-300 hover:bg-primary/10" title="Exportar Dados">
+                <span class="material-symbols-outlined"> output </span>
+            </button>
+        </div>
+    </header>
+    <main class="flex-1 overflow-y-auto p-4">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Gerenciar Códigos de Abastecimento</h2>
+        <div id="abastecimento-list" class="space-y-3">
+        </div>
+    </main>
+    <footer class="p-4 flex gap-4">
+        <button id="import-button" onclick="openImportModal()"
+            class="w-full flex items-center justify-center gap-2 bg-gray-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-500/50 transition-transform transform active:scale-95">
+            <span class="material-symbols-outlined"> upload_file </span>
+            <span>Importar em Massa</span>
+        </button>
+        <button id="add-new-button"
+            class="w-full flex items-center justify-center gap-2 bg-primary text-white font-bold py-4 px-6 rounded-xl shadow-lg hover:bg-primary/90 focus:outline-none focus:ring-4 focus:ring-primary/50 transition-transform transform active:scale-95">
+            <span class="material-symbols-outlined"> add_circle </span>
+            <span>Adicionar Novo Abastecimento</span>
+        </button>
+    </footer>
+</div>
+
+<div id="export-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-background-light dark:bg-background-dark p-6 rounded-xl shadow-2xl max-w-lg w-full space-y-4">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Copiar Dados para o Código-Fonte</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+            Copie o conteúdo abaixo e cole na variável <code>INITIAL_ABASTECIMENTOS</code> nos seus arquivos HTML.
+        </p>
+        <textarea id="export-data-area" readonly rows="10" class="w-full text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 resize-none"></textarea>
+        
+        <div class="flex justify-end space-x-3 pt-2">
+            <button onclick="document.getElementById('export-modal').classList.add('hidden')"
+                    class="py-2 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                Fechar
+            </button>
+            <button onclick="copyToClipboard()"
+                    class="py-2 px-4 rounded-lg text-white bg-primary hover:bg-primary/90 transition">
+                Copiar para Área de Transferência
+            </button>
+        </div>
+    </div>
+</div>
+<div id="import-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-background-light dark:bg-background-dark p-6 rounded-xl shadow-2xl max-w-2xl w-full space-y-4">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Importar Abastecimentos em Massa (CSV/Texto)</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+            Copie e cole os dados de sua planilha (Excel, Google Sheets). As colunas devem estar na seguinte ordem:
+            <br>
+            <span class="font-bold text-primary">Nome | Código | Arquivo da Imagem (Ex: nome.JPG) | Lastro | Camada | Tipo</span>
+        </p>
+        
+        <textarea id="import-data-area" rows="10" placeholder="Cole os dados separados por tabulação ou vírgula aqui..."
+                  class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary resize-none"></textarea>
+        
+        <div class="flex justify-end space-x-3 pt-2">
+            <button onclick="closeImportModal()"
+                    class="py-2 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                Cancelar
+            </button>
+            <button onclick="handleImportData()"
+                    class="py-2 px-4 rounded-lg text-white bg-green-600 hover:bg-green-700 transition">
+                Processar e Importar
+            </button>
+        </div>
+    </div>
+</div>
+<div id="edit-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-background-light dark:bg-background-dark p-6 rounded-xl shadow-2xl max-w-sm w-full space-y-4">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Editar Abastecimento</h3>
+        <input type="hidden" id="edit-item-id">
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="edit-nome">Nome</label><input id="edit-nome" type="text" placeholder="Nome do Abastecimento" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="edit-codigo">Código do Abastecimento</label><input id="edit-codigo" type="text" placeholder="Código único para este item" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="edit-codigo-imagem">Arquivo da Imagem (Ex: nome.JPG)</label><input id="edit-codigo-imagem" type="text" placeholder="Nome COMPLETO do arquivo (incluindo .jpg, .png, .JPG)" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <hr class="border-gray-300 dark:border-gray-700">
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="edit-lastro">Lastro</label><input id="edit-lastro" type="text" placeholder="Informação sobre Lastro" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="edit-camada">Camada</label><input id="edit-camada" type="text" placeholder="Informação sobre Camada" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="edit-tipo">Tipo de Abastecimento</label><input id="edit-tipo" type="text" placeholder="Tipo (Ex: Diesel, Gasolina)" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div class="flex justify-end space-x-3 pt-2">
+            <button onclick="closeModal()" class="py-2 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Cancelar</button>
+            <button onclick="handleSaveEdit()" class="py-2 px-4 rounded-lg text-white bg-primary hover:bg-primary/90 transition">Salvar</button>
+        </div>
+    </div>
+</div>
+<div id="add-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-background-light dark:bg-background-dark p-6 rounded-xl shadow-2xl max-w-sm w-full space-y-4">
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white">Adicionar Novo Abastecimento</h3>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="add-nome">Nome</label><input id="add-nome" type="text" placeholder="Nome do Abastecimento" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="add-codigo">Código do Abastecimento</label><input id="add-codigo" type="text" placeholder="Código único para este item (ex: 99999)" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="add-codigo-imagem">Arquivo da Imagem (Ex: nome.JPG)</label><input id="add-codigo-imagem" type="text" placeholder="Nome COMPLETO do arquivo (incluindo .jpg, .png, .JPG)" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+
+        <hr class="border-gray-300 dark:border-gray-700">
+
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="add-lastro">Lastro</label><input id="add-lastro" type="text" placeholder="Informação sobre Lastro" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="add-camada">Camada</label><input id="add-camada" type="text" placeholder="Informação sobre Camada" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div><label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" for="add-tipo">Tipo de Abastecimento</label><input id="add-tipo" type="text" placeholder="Tipo (Ex: Diesel, Gasolina)" class="form-input w-full rounded-lg border-gray-300 dark:border-gray-700 dark:bg-gray-800/50 p-3 text-base text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-primary focus:ring-primary"/></div>
+        
+        <div class="flex justify-end space-x-3 pt-2">
+            <button onclick="closeAddModal()" class="py-2 px-4 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">Cancelar</button>
+            <button onclick="handleAddNew()" class="py-2 px-4 rounded-lg text-white bg-primary hover:bg-primary/90 transition">Adicionar</button>
+        </div>
+    </div>
+</div>
+<script src="admin-panel.js"></script>
+</body>
+</html>
