@@ -4,9 +4,33 @@ const STORAGE_KEY = 'appconsulta_abastecimentos';
 
 // Dados iniciais de fallback (usados se o localStorage estiver vazio)
 const INITIAL_ABASTECIMENTOS = [
-    { id: 1, nome: "Smirnoff Vodka", codigo: "2015", codigoImagem: "smirnoff.JPG", lastro: "100%", camada: "A", tipo: "Gasolina" }, 
-    { id: 2, nome: "Poste de Gasolina #1", codigo: "67890", codigoImagem: "generico_gas.png", lastro: "0%", camada: "C", tipo: "Diesel" },
-    { id: 3, nome: "Poste de Gasolina #2", codigo: "11223", codigoImagem: "generico_gas.png", lastro: "50%", camada: "B", tipo: "Etanol" }, 
+  {
+    "id": 1,
+    "nome": "Eternity Maça Verde",
+    "codigo": "17898422679399",
+    "codigoImagem": "13.1.png",
+    "lastro": "13",
+    "camada": "3",
+    "tipo": "Batido"
+  },
+  {
+    "id": 2,
+    "nome": "Eternity Maça Verde",
+    "codigo": "7898422679392",
+    "codigoImagem": "13.1.png",
+    "lastro": "13",
+    "camada": "3",
+    "tipo": "Batido"
+  },
+  {
+    "id": 3,
+    "nome": "Poste de Gasolina #2",
+    "codigo": "11223",
+    "codigoImagem": "generico_gas.png",
+    "lastro": "50%",
+    "camada": "B",
+    "tipo": "Etanol"
+  }
 ];
 
 // --- FUNÇÕES DE ARMAZENAMENTO ---
